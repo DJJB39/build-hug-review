@@ -4,19 +4,12 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/*
- * Design system definition.
- *
- * The @theme inline block maps CSS custom properties to Tailwind utility
- * classes (e.g. --color-primary -> bg-primary, text-primary).
- *
- * The :root and .dark blocks define the actual color values using oklch.
- * All colors MUST use oklch format.
- *
- * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
- * 2. Register it in @theme inline as --color-<name>: var(--<name>)
- */
+/* ==========================================================================
+   Bisque — Design System
+   Golf Croquet league + handicap tracker.
+   Visual language: warm canvas, lawn green, editorial serif numerals.
+   No gradients. No drop shadows. Left-border highlights instead.
+   ========================================================================== */
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -26,14 +19,17 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-canvas: var(--canvas);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -42,15 +38,27 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
+
+  /* Ball-colour accents — used sparingly for player identity / chips */
+  --color-ball-clay: var(--ball-clay);
+  --color-ball-ochre: var(--ball-ochre);
+  --color-ball-navy: var(--ball-navy);
+  --color-ball-charcoal: var(--ball-charcoal);
+
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -59,77 +67,133 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  --font-sans:
+    "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-serif:
+    "Fraunces", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-mono:
+    "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.984 0.003 247.858);
-  --sidebar-foreground: oklch(0.129 0.042 264.695);
-  --sidebar-primary: oklch(0.208 0.042 265.755);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.968 0.007 247.896);
-  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
-  --sidebar-border: oklch(0.929 0.013 255.508);
-  --sidebar-ring: oklch(0.704 0.04 256.788);
+  --radius: 0.75rem;
+
+  /* Canvas — warm bisque/cream */
+  --background: oklch(0.965 0.012 85);
+  --canvas: oklch(0.965 0.012 85);
+  --foreground: oklch(0.22 0.02 150);
+
+  --card: oklch(0.985 0.008 85);
+  --card-foreground: oklch(0.22 0.02 150);
+  --popover: oklch(0.985 0.008 85);
+  --popover-foreground: oklch(0.22 0.02 150);
+
+  /* Lawn green primary */
+  --primary: oklch(0.42 0.09 150);
+  --primary-foreground: oklch(0.97 0.01 85);
+  --primary-soft: oklch(0.92 0.04 150);
+
+  --secondary: oklch(0.93 0.015 85);
+  --secondary-foreground: oklch(0.28 0.03 150);
+
+  --muted: oklch(0.93 0.012 85);
+  --muted-foreground: oklch(0.48 0.02 140);
+
+  --accent: oklch(0.92 0.04 150);
+  --accent-foreground: oklch(0.28 0.05 150);
+
+  --destructive: oklch(0.55 0.18 28);
+  --destructive-foreground: oklch(0.98 0.01 85);
+
+  --success: oklch(0.55 0.13 150);
+  --success-foreground: oklch(0.98 0.01 85);
+
+  --warning: oklch(0.72 0.14 75);
+  --warning-foreground: oklch(0.22 0.02 150);
+
+  --border: oklch(0.88 0.018 85);
+  --input: oklch(0.88 0.018 85);
+  --ring: oklch(0.42 0.09 150);
+
+  /* Ball colours — Golf Croquet ball set, muted/editorial */
+  --ball-clay: oklch(0.58 0.14 30);     /* red */
+  --ball-ochre: oklch(0.75 0.13 80);    /* yellow */
+  --ball-navy: oklch(0.38 0.09 250);    /* blue */
+  --ball-charcoal: oklch(0.32 0.015 150); /* black */
+
+  --chart-1: oklch(0.42 0.09 150);
+  --chart-2: oklch(0.58 0.14 30);
+  --chart-3: oklch(0.38 0.09 250);
+  --chart-4: oklch(0.75 0.13 80);
+  --chart-5: oklch(0.55 0.05 150);
+
+  --sidebar: oklch(0.965 0.012 85);
+  --sidebar-foreground: oklch(0.22 0.02 150);
+  --sidebar-primary: oklch(0.42 0.09 150);
+  --sidebar-primary-foreground: oklch(0.97 0.01 85);
+  --sidebar-accent: oklch(0.92 0.04 150);
+  --sidebar-accent-foreground: oklch(0.28 0.05 150);
+  --sidebar-border: oklch(0.88 0.018 85);
+  --sidebar-ring: oklch(0.42 0.09 150);
 }
 
 .dark {
-  --background: oklch(0.129 0.042 264.695);
-  --foreground: oklch(0.984 0.003 247.858);
-  --card: oklch(0.208 0.042 265.755);
-  --card-foreground: oklch(0.984 0.003 247.858);
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(0.984 0.003 247.858);
-  --primary: oklch(0.929 0.013 255.508);
-  --primary-foreground: oklch(0.208 0.042 265.755);
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.704 0.04 256.788);
-  --accent: oklch(0.279 0.041 260.031);
-  --accent-foreground: oklch(0.984 0.003 247.858);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
+  /* Night lawn — deep green-tinted ink */
+  --background: oklch(0.18 0.018 150);
+  --canvas: oklch(0.18 0.018 150);
+  --foreground: oklch(0.95 0.012 85);
+
+  --card: oklch(0.22 0.022 150);
+  --card-foreground: oklch(0.95 0.012 85);
+  --popover: oklch(0.22 0.022 150);
+  --popover-foreground: oklch(0.95 0.012 85);
+
+  --primary: oklch(0.72 0.13 150);
+  --primary-foreground: oklch(0.18 0.018 150);
+  --primary-soft: oklch(0.32 0.05 150);
+
+  --secondary: oklch(0.27 0.025 150);
+  --secondary-foreground: oklch(0.95 0.012 85);
+
+  --muted: oklch(0.27 0.025 150);
+  --muted-foreground: oklch(0.7 0.02 140);
+
+  --accent: oklch(0.32 0.05 150);
+  --accent-foreground: oklch(0.95 0.012 85);
+
+  --destructive: oklch(0.62 0.18 28);
+  --destructive-foreground: oklch(0.98 0.01 85);
+
+  --success: oklch(0.7 0.14 150);
+  --success-foreground: oklch(0.18 0.018 150);
+
+  --warning: oklch(0.78 0.14 75);
+  --warning-foreground: oklch(0.18 0.018 150);
+
   --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.551 0.027 264.364);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.208 0.042 265.755);
-  --sidebar-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.279 0.041 260.031);
-  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
+  --input: oklch(1 0 0 / 12%);
+  --ring: oklch(0.72 0.13 150);
+
+  --ball-clay: oklch(0.65 0.16 30);
+  --ball-ochre: oklch(0.8 0.14 80);
+  --ball-navy: oklch(0.55 0.13 250);
+  --ball-charcoal: oklch(0.55 0.015 150);
+
+  --chart-1: oklch(0.72 0.13 150);
+  --chart-2: oklch(0.65 0.16 30);
+  --chart-3: oklch(0.55 0.13 250);
+  --chart-4: oklch(0.8 0.14 80);
+  --chart-5: oklch(0.7 0.04 150);
+
+  --sidebar: oklch(0.18 0.018 150);
+  --sidebar-foreground: oklch(0.95 0.012 85);
+  --sidebar-primary: oklch(0.72 0.13 150);
+  --sidebar-primary-foreground: oklch(0.18 0.018 150);
+  --sidebar-accent: oklch(0.32 0.05 150);
+  --sidebar-accent-foreground: oklch(0.95 0.012 85);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.551 0.027 264.364);
+  --sidebar-ring: oklch(0.72 0.13 150);
 }
 
 @layer base {
@@ -137,8 +201,119 @@
     border-color: var(--color-border);
   }
 
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: var(--font-serif);
+    font-feature-settings: "ss01";
+    letter-spacing: -0.01em;
+  }
+
+  /* Tabular numerals everywhere a number reads as data */
+  .tabular,
+  .score,
+  .handicap-num {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+
+  .score {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    font-variation-settings: "opsz" 144, "SOFT" 0, "WONK" 0;
+  }
+}
+
+@layer utilities {
+  /* Lawn-grid SVG motif used on empty states and splash backgrounds */
+  .bg-lawn-grid {
+    background-image:
+      linear-gradient(
+        to right,
+        color-mix(in oklab, var(--primary) 10%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        color-mix(in oklab, var(--primary) 10%, transparent) 1px,
+        transparent 1px
+      );
+    background-size: 32px 32px;
+  }
+
+  .bg-lawn-grid-fade {
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+  }
+
+  /* Left-border highlight pattern used instead of shadows for "current" rows */
+  .ring-left {
+    box-shadow: inset 3px 0 0 0 var(--primary);
+  }
+
+  /* Minimum tap-target helper (52px) */
+  .tap {
+    min-height: 52px;
+    min-width: 52px;
+  }
+
+  /* Page transition primitive */
+  .page-enter {
+    animation: page-fade-slide 180ms ease-out both;
+  }
+
+  @keyframes page-fade-slide {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Score reveal */
+  .score-reveal {
+    animation: score-reveal 160ms ease-out both;
+  }
+  @keyframes score-reveal {
+    from {
+      opacity: 0;
+      transform: scale(0.92);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Tracker flip — used when an extra stroke is consumed */
+  .stroke-flip {
+    animation: stroke-flip 240ms ease-in-out both;
+  }
+  @keyframes stroke-flip {
+    0% {
+      transform: rotateX(0deg);
+    }
+    50% {
+      transform: rotateX(90deg);
+      opacity: 0.4;
+    }
+    100% {
+      transform: rotateX(0deg);
+    }
   }
 }

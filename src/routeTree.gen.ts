@@ -13,7 +13,14 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as HelpRouteImport } from './routes/help'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppSettingsRouteImport } from './routes/_app.settings'
+import { Route as AppProfileRouteImport } from './routes/_app.profile'
+import { Route as AppLeaguesRouteImport } from './routes/_app.leagues'
+import { Route as AppHomeRouteImport } from './routes/_app.home'
+import { Route as AppLeaguesNewRouteImport } from './routes/_app.leagues.new'
+import { Route as AppLeaguesLeagueIdRouteImport } from './routes/_app.leagues.$leagueId'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -35,10 +42,44 @@ const HelpRoute = HelpRouteImport.update({
   path: '/help',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProfileRoute = AppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppLeaguesRoute = AppLeaguesRouteImport.update({
+  id: '/leagues',
+  path: '/leagues',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppHomeRoute = AppHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppLeaguesNewRoute = AppLeaguesNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AppLeaguesRoute,
+} as any)
+const AppLeaguesLeagueIdRoute = AppLeaguesLeagueIdRouteImport.update({
+  id: '/$leagueId',
+  path: '/$leagueId',
+  getParentRoute: () => AppLeaguesRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -47,6 +88,12 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/signup': typeof SignupRoute
+  '/home': typeof AppHomeRoute
+  '/leagues': typeof AppLeaguesRouteWithChildren
+  '/profile': typeof AppProfileRoute
+  '/settings': typeof AppSettingsRoute
+  '/leagues/$leagueId': typeof AppLeaguesLeagueIdRoute
+  '/leagues/new': typeof AppLeaguesNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,25 +101,74 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/signup': typeof SignupRoute
+  '/home': typeof AppHomeRoute
+  '/leagues': typeof AppLeaguesRouteWithChildren
+  '/profile': typeof AppProfileRoute
+  '/settings': typeof AppSettingsRoute
+  '/leagues/$leagueId': typeof AppLeaguesLeagueIdRoute
+  '/leagues/new': typeof AppLeaguesNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
   '/help': typeof HelpRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/signup': typeof SignupRoute
+  '/_app/home': typeof AppHomeRoute
+  '/_app/leagues': typeof AppLeaguesRouteWithChildren
+  '/_app/profile': typeof AppProfileRoute
+  '/_app/settings': typeof AppSettingsRoute
+  '/_app/leagues/$leagueId': typeof AppLeaguesLeagueIdRoute
+  '/_app/leagues/new': typeof AppLeaguesNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/help' | '/login' | '/onboarding' | '/signup'
+  fullPaths:
+    | '/'
+    | '/help'
+    | '/login'
+    | '/onboarding'
+    | '/signup'
+    | '/home'
+    | '/leagues'
+    | '/profile'
+    | '/settings'
+    | '/leagues/$leagueId'
+    | '/leagues/new'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/help' | '/login' | '/onboarding' | '/signup'
-  id: '__root__' | '/' | '/help' | '/login' | '/onboarding' | '/signup'
+  to:
+    | '/'
+    | '/help'
+    | '/login'
+    | '/onboarding'
+    | '/signup'
+    | '/home'
+    | '/leagues'
+    | '/profile'
+    | '/settings'
+    | '/leagues/$leagueId'
+    | '/leagues/new'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/help'
+    | '/login'
+    | '/onboarding'
+    | '/signup'
+    | '/_app/home'
+    | '/_app/leagues'
+    | '/_app/profile'
+    | '/_app/settings'
+    | '/_app/leagues/$leagueId'
+    | '/_app/leagues/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
   HelpRoute: typeof HelpRoute
   LoginRoute: typeof LoginRoute
   OnboardingRoute: typeof OnboardingRoute
@@ -109,6 +205,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HelpRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -116,11 +219,84 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/settings': {
+      id: '/_app/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/profile': {
+      id: '/_app/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AppProfileRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/leagues': {
+      id: '/_app/leagues'
+      path: '/leagues'
+      fullPath: '/leagues'
+      preLoaderRoute: typeof AppLeaguesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/home': {
+      id: '/_app/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof AppHomeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/leagues/new': {
+      id: '/_app/leagues/new'
+      path: '/new'
+      fullPath: '/leagues/new'
+      preLoaderRoute: typeof AppLeaguesNewRouteImport
+      parentRoute: typeof AppLeaguesRoute
+    }
+    '/_app/leagues/$leagueId': {
+      id: '/_app/leagues/$leagueId'
+      path: '/$leagueId'
+      fullPath: '/leagues/$leagueId'
+      preLoaderRoute: typeof AppLeaguesLeagueIdRouteImport
+      parentRoute: typeof AppLeaguesRoute
+    }
   }
 }
 
+interface AppLeaguesRouteChildren {
+  AppLeaguesLeagueIdRoute: typeof AppLeaguesLeagueIdRoute
+  AppLeaguesNewRoute: typeof AppLeaguesNewRoute
+}
+
+const AppLeaguesRouteChildren: AppLeaguesRouteChildren = {
+  AppLeaguesLeagueIdRoute: AppLeaguesLeagueIdRoute,
+  AppLeaguesNewRoute: AppLeaguesNewRoute,
+}
+
+const AppLeaguesRouteWithChildren = AppLeaguesRoute._addFileChildren(
+  AppLeaguesRouteChildren,
+)
+
+interface AppRouteChildren {
+  AppHomeRoute: typeof AppHomeRoute
+  AppLeaguesRoute: typeof AppLeaguesRouteWithChildren
+  AppProfileRoute: typeof AppProfileRoute
+  AppSettingsRoute: typeof AppSettingsRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppHomeRoute: AppHomeRoute,
+  AppLeaguesRoute: AppLeaguesRouteWithChildren,
+  AppProfileRoute: AppProfileRoute,
+  AppSettingsRoute: AppSettingsRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
   HelpRoute: HelpRoute,
   LoginRoute: LoginRoute,
   OnboardingRoute: OnboardingRoute,
@@ -129,3 +305,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

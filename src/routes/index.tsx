@@ -1,7 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import * as React from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 
 import { PublicShell } from "@/components/layout/PublicShell";
 import { BisqueWordmark, BisqueMark } from "@/components/brand/BisqueWordmark";
+import { useAuth } from "@/lib/auth/AuthProvider";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
@@ -25,6 +27,13 @@ export const Route = createFileRoute("/")({
 });
 
 function SplashPage() {
+  const { session, loading } = useAuth();
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (!loading && session) void navigate({ to: "/home" });
+  }, [loading, session, navigate]);
+
   return (
     <PublicShell hideHeader>
       {/* HERO */}

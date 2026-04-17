@@ -1,10 +1,13 @@
 import * as React from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 
 import { PublicShell } from "@/components/layout/PublicShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -20,11 +23,33 @@ function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [busy, setBusy] = React.useState(false);
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // Auth wiring lands when Lovable Cloud is enabled — for now go to /home preview.
-    navigate({ to: "/" });
+    setBusy(true);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setBusy(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    void navigate({ to: "/home" });
+  }
+
+  async function onGoogle() {
+    setBusy(true);
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: `${window.location.origin}/home`,
+    });
+    if (result.error) {
+      toast.error(result.error.message);
+      setBusy(false);
+      return;
+    }
+    if (!result.redirected) {
+      void navigate({ to: "/home" });
+    }
   }
 
   return (
@@ -72,8 +97,8 @@ function LoginPage() {
             />
           </div>
 
-          <Button type="submit" className="tap w-full text-base">
-            Log in
+          <Button type="submit" disabled={busy} className="tap w-full text-base">
+            {busy ? "Logging in…" : "Log in"}
           </Button>
         </form>
 
@@ -83,7 +108,13 @@ function LoginPage() {
           <div className="h-px flex-1 bg-border" />
         </div>
 
-        <Button variant="outline" className="tap w-full text-base" type="button">
+        <Button
+          variant="outline"
+          className="tap w-full text-base"
+          type="button"
+          disabled={busy}
+          onClick={() => void onGoogle()}
+        >
           Continue with Google
         </Button>
 

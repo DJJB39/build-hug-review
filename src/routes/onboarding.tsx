@@ -1,10 +1,13 @@
 import * as React from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 
 import { PublicShell } from "@/components/layout/PublicShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/lib/auth/AuthProvider";
+import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/onboarding")({
@@ -21,7 +24,9 @@ const STEPS = ["Your details", "Handicap", "Terms"] as const;
 
 function OnboardingPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [step, setStep] = React.useState(0);
+  const [saving, setSaving] = React.useState(false);
 
   // Step 1
   const [name, setName] = React.useState("");
@@ -32,9 +37,40 @@ function OnboardingPage() {
   // Step 3
   const [accepted, setAccepted] = React.useState(false);
 
+  // Hydrate name from user metadata.
+  React.useEffect(() => {
+    if (!user) return;
+    const meta = (user.user_metadata ?? {}) as Record<string, string>;
+    setName((prev) => prev || meta.display_name || meta.full_name || meta.name || "");
+  }, [user]);
+
+  async function finish() {
+    if (!user) {
+      void navigate({ to: "/login" });
+      return;
+    }
+    setSaving(true);
+    const gc = unknown ? 12 : Number(handicap);
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        display_name: name.trim(),
+        club: club.trim() || null,
+        gc_handicap: gc,
+        onboarded_at: new Date().toISOString(),
+      })
+      .eq("id", user.id);
+    setSaving(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    void navigate({ to: "/home" });
+  }
+
   function next() {
     if (step < STEPS.length - 1) setStep(step + 1);
-    else navigate({ to: "/" });
+    else void finish();
   }
   function back() {
     if (step > 0) setStep(step - 1);
@@ -110,7 +146,7 @@ function OnboardingPage() {
                   Your Golf Croquet handicap?
                 </h1>
                 <p className="mt-2 text-muted-foreground">
-                  Croquet England scale, −3 to 24. We’ll start your index at the lower trigger.
+                  Croquet England scale, −3 to 24. We'll start your index at the lower trigger.
                 </p>
               </div>
 
@@ -151,9 +187,9 @@ function OnboardingPage() {
                       aria-hidden
                     />
                     <div>
-                      <div className="text-sm font-medium">I don’t know my handicap</div>
+                      <div className="text-sm font-medium">I don't know my handicap</div>
                       <div className="text-xs text-muted-foreground">
-                        We’ll start you at 12 and adjust as you play.
+                        We'll start you at 12 and adjust as you play.
                       </div>
                     </div>
                   </div>
@@ -205,7 +241,7 @@ function OnboardingPage() {
                     <a href="#" className="text-primary underline">
                       Privacy Policy
                     </a>
-                    , and I understand that Bisque’s handicap calculations are estimates.
+                    , and I understand that Bisque's handicap calculations are estimates.
                   </div>
                 </div>
               </button>
@@ -226,8 +262,8 @@ function OnboardingPage() {
               Cancel
             </Link>
           )}
-          <Button onClick={next} disabled={!canAdvance} className="tap flex-[2]">
-            {step === STEPS.length - 1 ? "Finish" : "Continue"}
+          <Button onClick={next} disabled={!canAdvance || saving} className="tap flex-[2]">
+            {saving ? "Saving…" : step === STEPS.length - 1 ? "Finish" : "Continue"}
           </Button>
         </div>
       </div>

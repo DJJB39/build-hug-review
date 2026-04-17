@@ -1,10 +1,13 @@
 import * as React from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 
 import { PublicShell } from "@/components/layout/PublicShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 
 export const Route = createFileRoute("/signup")({
   head: () => ({
@@ -21,12 +24,44 @@ export const Route = createFileRoute("/signup")({
 
 function SignupPage() {
   const navigate = useNavigate();
+  const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [busy, setBusy] = React.useState(false);
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    navigate({ to: "/onboarding" });
+    setBusy(true);
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/onboarding`,
+        data: { display_name: name || email.split("@")[0] },
+      },
+    });
+    setBusy(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Account created — let's set you up.");
+    void navigate({ to: "/onboarding" });
+  }
+
+  async function onGoogle() {
+    setBusy(true);
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: `${window.location.origin}/onboarding`,
+    });
+    if (result.error) {
+      toast.error(result.error.message);
+      setBusy(false);
+      return;
+    }
+    if (!result.redirected) {
+      void navigate({ to: "/onboarding" });
+    }
   }
 
   return (
@@ -46,6 +81,18 @@ function SignupPage() {
         </div>
 
         <form onSubmit={onSubmit} className="mt-10 space-y-5">
+          <div className="space-y-2">
+            <Label htmlFor="name">Your name</Label>
+            <Input
+              id="name"
+              type="text"
+              autoComplete="name"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="tap"
+            />
+          </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -73,8 +120,8 @@ function SignupPage() {
             <p className="text-xs text-muted-foreground">At least 8 characters.</p>
           </div>
 
-          <Button type="submit" className="tap w-full text-base">
-            Create account
+          <Button type="submit" disabled={busy} className="tap w-full text-base">
+            {busy ? "Creating…" : "Create account"}
           </Button>
         </form>
 
@@ -84,7 +131,13 @@ function SignupPage() {
           <div className="h-px flex-1 bg-border" />
         </div>
 
-        <Button variant="outline" className="tap w-full text-base" type="button">
+        <Button
+          variant="outline"
+          className="tap w-full text-base"
+          type="button"
+          disabled={busy}
+          onClick={() => void onGoogle()}
+        >
           Continue with Google
         </Button>
 

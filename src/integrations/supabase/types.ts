@@ -101,6 +101,7 @@ export type Database = {
           combined_scoring: boolean
           created_at: string
           description: string | null
+          discipline: Database["public"]["Enums"]["league_discipline"]
           format: Database["public"]["Enums"]["league_format"]
           handicap_enabled: boolean
           id: string
@@ -116,6 +117,7 @@ export type Database = {
           combined_scoring?: boolean
           created_at?: string
           description?: string | null
+          discipline?: Database["public"]["Enums"]["league_discipline"]
           format?: Database["public"]["Enums"]["league_format"]
           handicap_enabled?: boolean
           id?: string
@@ -131,6 +133,7 @@ export type Database = {
           combined_scoring?: boolean
           created_at?: string
           description?: string | null
+          discipline?: Database["public"]["Enums"]["league_discipline"]
           format?: Database["public"]["Enums"]["league_format"]
           handicap_enabled?: boolean
           id?: string
@@ -310,6 +313,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          ac_handicap: number
           avatar_url: string | null
           club: string | null
           created_at: string
@@ -323,6 +327,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          ac_handicap?: number
           avatar_url?: string | null
           club?: string | null
           created_at?: string
@@ -336,6 +341,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          ac_handicap?: number
           avatar_url?: string | null
           club?: string | null
           created_at?: string
@@ -407,6 +413,7 @@ export type Database = {
       confirmation_state: "pending" | "confirmed" | "disputed"
       handicap_reason: "match" | "manual" | "club_override" | "initial"
       handicap_source: "self" | "club" | "system"
+      league_discipline: "gc" | "ac"
       league_format: "singles" | "doubles" | "mixed"
       league_status: "active" | "archived"
       match_status:
@@ -550,6 +557,7 @@ export const Constants = {
       confirmation_state: ["pending", "confirmed", "disputed"],
       handicap_reason: ["match", "manual", "club_override", "initial"],
       handicap_source: ["self", "club", "system"],
+      league_discipline: ["gc", "ac"],
       league_format: ["singles", "doubles", "mixed"],
       league_status: ["active", "archived"],
       match_status: [

@@ -20,17 +20,16 @@ const RAW_FILES = import.meta.glob(
     "/src/**/*.{ts,tsx,js,jsx,css,md,json,toml}",
     "/supabase/**/*.{toml,sql,ts}",
     "/*.{ts,tsx,js,jsx,json,toml,md,html,cjs,mjs}",
-    "/.prettierrc",
-    "/.prettierignore",
     // Exclusions
     "!**/node_modules/**",
     "!**/dist/**",
     "!**/.lovable/**",
+    // Server-only modules cannot be inlined into the client bundle.
+    "!**/*.server.ts",
+    "!**/*.server.tsx",
+    "!**/*.server.js",
     "!/src/routeTree.gen.ts",
     "!/src/integrations/supabase/types.ts",
-    "!/bun.lockb",
-    "!/package-lock.json",
-    "!/.env",
   ],
   { query: "?raw", import: "default", eager: true },
 ) as Record<string, string>;

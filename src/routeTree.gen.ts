@@ -21,6 +21,8 @@ import { Route as AppLeaguesRouteImport } from './routes/_app.leagues'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
 import { Route as AppLeaguesNewRouteImport } from './routes/_app.leagues.new'
 import { Route as AppLeaguesLeagueIdRouteImport } from './routes/_app.leagues.$leagueId'
+import { Route as AppLeaguesLeagueIdMatchesNewRouteImport } from './routes/_app.leagues.$leagueId.matches.new'
+import { Route as AppLeaguesLeagueIdMatchesMatchIdRouteImport } from './routes/_app.leagues.$leagueId.matches.$matchId'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -81,6 +83,18 @@ const AppLeaguesLeagueIdRoute = AppLeaguesLeagueIdRouteImport.update({
   path: '/$leagueId',
   getParentRoute: () => AppLeaguesRoute,
 } as any)
+const AppLeaguesLeagueIdMatchesNewRoute =
+  AppLeaguesLeagueIdMatchesNewRouteImport.update({
+    id: '/matches/new',
+    path: '/matches/new',
+    getParentRoute: () => AppLeaguesLeagueIdRoute,
+  } as any)
+const AppLeaguesLeagueIdMatchesMatchIdRoute =
+  AppLeaguesLeagueIdMatchesMatchIdRouteImport.update({
+    id: '/matches/$matchId',
+    path: '/matches/$matchId',
+    getParentRoute: () => AppLeaguesLeagueIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -92,8 +106,10 @@ export interface FileRoutesByFullPath {
   '/leagues': typeof AppLeaguesRouteWithChildren
   '/profile': typeof AppProfileRoute
   '/settings': typeof AppSettingsRoute
-  '/leagues/$leagueId': typeof AppLeaguesLeagueIdRoute
+  '/leagues/$leagueId': typeof AppLeaguesLeagueIdRouteWithChildren
   '/leagues/new': typeof AppLeaguesNewRoute
+  '/leagues/$leagueId/matches/$matchId': typeof AppLeaguesLeagueIdMatchesMatchIdRoute
+  '/leagues/$leagueId/matches/new': typeof AppLeaguesLeagueIdMatchesNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -105,8 +121,10 @@ export interface FileRoutesByTo {
   '/leagues': typeof AppLeaguesRouteWithChildren
   '/profile': typeof AppProfileRoute
   '/settings': typeof AppSettingsRoute
-  '/leagues/$leagueId': typeof AppLeaguesLeagueIdRoute
+  '/leagues/$leagueId': typeof AppLeaguesLeagueIdRouteWithChildren
   '/leagues/new': typeof AppLeaguesNewRoute
+  '/leagues/$leagueId/matches/$matchId': typeof AppLeaguesLeagueIdMatchesMatchIdRoute
+  '/leagues/$leagueId/matches/new': typeof AppLeaguesLeagueIdMatchesNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -120,8 +138,10 @@ export interface FileRoutesById {
   '/_app/leagues': typeof AppLeaguesRouteWithChildren
   '/_app/profile': typeof AppProfileRoute
   '/_app/settings': typeof AppSettingsRoute
-  '/_app/leagues/$leagueId': typeof AppLeaguesLeagueIdRoute
+  '/_app/leagues/$leagueId': typeof AppLeaguesLeagueIdRouteWithChildren
   '/_app/leagues/new': typeof AppLeaguesNewRoute
+  '/_app/leagues/$leagueId/matches/$matchId': typeof AppLeaguesLeagueIdMatchesMatchIdRoute
+  '/_app/leagues/$leagueId/matches/new': typeof AppLeaguesLeagueIdMatchesNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -137,6 +157,8 @@ export interface FileRouteTypes {
     | '/settings'
     | '/leagues/$leagueId'
     | '/leagues/new'
+    | '/leagues/$leagueId/matches/$matchId'
+    | '/leagues/$leagueId/matches/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -150,6 +172,8 @@ export interface FileRouteTypes {
     | '/settings'
     | '/leagues/$leagueId'
     | '/leagues/new'
+    | '/leagues/$leagueId/matches/$matchId'
+    | '/leagues/$leagueId/matches/new'
   id:
     | '__root__'
     | '/'
@@ -164,6 +188,8 @@ export interface FileRouteTypes {
     | '/_app/settings'
     | '/_app/leagues/$leagueId'
     | '/_app/leagues/new'
+    | '/_app/leagues/$leagueId/matches/$matchId'
+    | '/_app/leagues/$leagueId/matches/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -261,16 +287,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppLeaguesLeagueIdRouteImport
       parentRoute: typeof AppLeaguesRoute
     }
+    '/_app/leagues/$leagueId/matches/new': {
+      id: '/_app/leagues/$leagueId/matches/new'
+      path: '/matches/new'
+      fullPath: '/leagues/$leagueId/matches/new'
+      preLoaderRoute: typeof AppLeaguesLeagueIdMatchesNewRouteImport
+      parentRoute: typeof AppLeaguesLeagueIdRoute
+    }
+    '/_app/leagues/$leagueId/matches/$matchId': {
+      id: '/_app/leagues/$leagueId/matches/$matchId'
+      path: '/matches/$matchId'
+      fullPath: '/leagues/$leagueId/matches/$matchId'
+      preLoaderRoute: typeof AppLeaguesLeagueIdMatchesMatchIdRouteImport
+      parentRoute: typeof AppLeaguesLeagueIdRoute
+    }
   }
 }
 
+interface AppLeaguesLeagueIdRouteChildren {
+  AppLeaguesLeagueIdMatchesMatchIdRoute: typeof AppLeaguesLeagueIdMatchesMatchIdRoute
+  AppLeaguesLeagueIdMatchesNewRoute: typeof AppLeaguesLeagueIdMatchesNewRoute
+}
+
+const AppLeaguesLeagueIdRouteChildren: AppLeaguesLeagueIdRouteChildren = {
+  AppLeaguesLeagueIdMatchesMatchIdRoute: AppLeaguesLeagueIdMatchesMatchIdRoute,
+  AppLeaguesLeagueIdMatchesNewRoute: AppLeaguesLeagueIdMatchesNewRoute,
+}
+
+const AppLeaguesLeagueIdRouteWithChildren =
+  AppLeaguesLeagueIdRoute._addFileChildren(AppLeaguesLeagueIdRouteChildren)
+
 interface AppLeaguesRouteChildren {
-  AppLeaguesLeagueIdRoute: typeof AppLeaguesLeagueIdRoute
+  AppLeaguesLeagueIdRoute: typeof AppLeaguesLeagueIdRouteWithChildren
   AppLeaguesNewRoute: typeof AppLeaguesNewRoute
 }
 
 const AppLeaguesRouteChildren: AppLeaguesRouteChildren = {
-  AppLeaguesLeagueIdRoute: AppLeaguesLeagueIdRoute,
+  AppLeaguesLeagueIdRoute: AppLeaguesLeagueIdRouteWithChildren,
   AppLeaguesNewRoute: AppLeaguesNewRoute,
 }
 

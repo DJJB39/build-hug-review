@@ -1,3 +1,4 @@
+import * as React from "react";
 import { createFileRoute, Outlet, redirect, useRouter } from "@tanstack/react-router";
 
 import { AppShell } from "@/components/layout/AppShell";

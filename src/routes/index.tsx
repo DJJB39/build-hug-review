@@ -5,6 +5,7 @@ import { PublicShell } from "@/components/layout/PublicShell";
 import { BisqueWordmark, BisqueMark } from "@/components/brand/BisqueWordmark";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { cn } from "@/lib/utils";
+import { downloadProjectMarkdown } from "@/lib/export/exportProjectMarkdown";
 
 export const Route = createFileRoute("/")({
   head: () => ({

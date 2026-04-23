@@ -149,7 +149,7 @@ function SplashPage() {
             <BisqueMark size={18} className="text-primary" />
             <span>© {new Date().getFullYear()} Bisque</span>
           </div>
-          <div className="flex items-center gap-5">
+          <div className="flex flex-wrap items-center gap-5">
             <Link to="/help" className="hover:text-foreground">
               Help
             </Link>
@@ -159,6 +159,13 @@ function SplashPage() {
             <a href="#" className="hover:text-foreground">
               Terms
             </a>
+            <button
+              type="button"
+              onClick={() => downloadProjectMarkdown()}
+              className="tap inline-flex items-center rounded-md border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-accent"
+            >
+              Export source (.md)
+            </button>
           </div>
         </div>
       </footer>

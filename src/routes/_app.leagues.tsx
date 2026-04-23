@@ -50,12 +50,20 @@ function LeaguesPage() {
             Everything you're playing in, plus what you've put away.
           </p>
         </div>
-        <Link
-          to="/leagues/new"
-          className="tap inline-flex items-center gap-1 rounded-xl bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-        >
-          <Plus className="size-4" aria-hidden /> New
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            to="/leagues/join"
+            className="tap inline-flex items-center rounded-xl border border-input bg-background px-4 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+          >
+            Join with code
+          </Link>
+          <Link
+            to="/leagues/new"
+            className="tap inline-flex items-center gap-1 rounded-xl bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            <Plus className="size-4" aria-hidden /> New
+          </Link>
+        </div>
       </header>
 
       {leaguesQuery.isLoading ? (

@@ -25,10 +25,12 @@ function AppLayout() {
   const { session, loading } = useAuth();
   const router = useRouter();
 
-  // If the listener tells us the session ended, bounce out.
-  if (!loading && !session) {
-    void router.navigate({ to: "/login" });
-  }
+  // If the listener tells us the session ended, bounce out (after render).
+  React.useEffect(() => {
+    if (!loading && !session) {
+      void router.navigate({ to: "/login" });
+    }
+  }, [loading, session, router]);
 
   if (loading || !session) {
     return (

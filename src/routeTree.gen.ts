@@ -20,6 +20,7 @@ import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppLeaguesRouteImport } from './routes/_app.leagues'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
 import { Route as AppLeaguesNewRouteImport } from './routes/_app.leagues.new'
+import { Route as AppLeaguesJoinRouteImport } from './routes/_app.leagues.join'
 import { Route as AppLeaguesLeagueIdRouteImport } from './routes/_app.leagues.$leagueId'
 import { Route as AppLeaguesLeagueIdMatchesNewRouteImport } from './routes/_app.leagues.$leagueId.matches.new'
 import { Route as AppLeaguesLeagueIdMatchesMatchIdRouteImport } from './routes/_app.leagues.$leagueId.matches.$matchId'
@@ -78,6 +79,11 @@ const AppLeaguesNewRoute = AppLeaguesNewRouteImport.update({
   path: '/new',
   getParentRoute: () => AppLeaguesRoute,
 } as any)
+const AppLeaguesJoinRoute = AppLeaguesJoinRouteImport.update({
+  id: '/join',
+  path: '/join',
+  getParentRoute: () => AppLeaguesRoute,
+} as any)
 const AppLeaguesLeagueIdRoute = AppLeaguesLeagueIdRouteImport.update({
   id: '/$leagueId',
   path: '/$leagueId',
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AppProfileRoute
   '/settings': typeof AppSettingsRoute
   '/leagues/$leagueId': typeof AppLeaguesLeagueIdRouteWithChildren
+  '/leagues/join': typeof AppLeaguesJoinRoute
   '/leagues/new': typeof AppLeaguesNewRoute
   '/leagues/$leagueId/matches/$matchId': typeof AppLeaguesLeagueIdMatchesMatchIdRoute
   '/leagues/$leagueId/matches/new': typeof AppLeaguesLeagueIdMatchesNewRoute
@@ -122,6 +129,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AppProfileRoute
   '/settings': typeof AppSettingsRoute
   '/leagues/$leagueId': typeof AppLeaguesLeagueIdRouteWithChildren
+  '/leagues/join': typeof AppLeaguesJoinRoute
   '/leagues/new': typeof AppLeaguesNewRoute
   '/leagues/$leagueId/matches/$matchId': typeof AppLeaguesLeagueIdMatchesMatchIdRoute
   '/leagues/$leagueId/matches/new': typeof AppLeaguesLeagueIdMatchesNewRoute
@@ -139,6 +147,7 @@ export interface FileRoutesById {
   '/_app/profile': typeof AppProfileRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/leagues/$leagueId': typeof AppLeaguesLeagueIdRouteWithChildren
+  '/_app/leagues/join': typeof AppLeaguesJoinRoute
   '/_app/leagues/new': typeof AppLeaguesNewRoute
   '/_app/leagues/$leagueId/matches/$matchId': typeof AppLeaguesLeagueIdMatchesMatchIdRoute
   '/_app/leagues/$leagueId/matches/new': typeof AppLeaguesLeagueIdMatchesNewRoute
@@ -156,6 +165,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/settings'
     | '/leagues/$leagueId'
+    | '/leagues/join'
     | '/leagues/new'
     | '/leagues/$leagueId/matches/$matchId'
     | '/leagues/$leagueId/matches/new'
@@ -171,6 +181,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/settings'
     | '/leagues/$leagueId'
+    | '/leagues/join'
     | '/leagues/new'
     | '/leagues/$leagueId/matches/$matchId'
     | '/leagues/$leagueId/matches/new'
@@ -187,6 +198,7 @@ export interface FileRouteTypes {
     | '/_app/profile'
     | '/_app/settings'
     | '/_app/leagues/$leagueId'
+    | '/_app/leagues/join'
     | '/_app/leagues/new'
     | '/_app/leagues/$leagueId/matches/$matchId'
     | '/_app/leagues/$leagueId/matches/new'
@@ -280,6 +292,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppLeaguesNewRouteImport
       parentRoute: typeof AppLeaguesRoute
     }
+    '/_app/leagues/join': {
+      id: '/_app/leagues/join'
+      path: '/join'
+      fullPath: '/leagues/join'
+      preLoaderRoute: typeof AppLeaguesJoinRouteImport
+      parentRoute: typeof AppLeaguesRoute
+    }
     '/_app/leagues/$leagueId': {
       id: '/_app/leagues/$leagueId'
       path: '/$leagueId'
@@ -319,11 +338,13 @@ const AppLeaguesLeagueIdRouteWithChildren =
 
 interface AppLeaguesRouteChildren {
   AppLeaguesLeagueIdRoute: typeof AppLeaguesLeagueIdRouteWithChildren
+  AppLeaguesJoinRoute: typeof AppLeaguesJoinRoute
   AppLeaguesNewRoute: typeof AppLeaguesNewRoute
 }
 
 const AppLeaguesRouteChildren: AppLeaguesRouteChildren = {
   AppLeaguesLeagueIdRoute: AppLeaguesLeagueIdRouteWithChildren,
+  AppLeaguesJoinRoute: AppLeaguesJoinRoute,
   AppLeaguesNewRoute: AppLeaguesNewRoute,
 }
 

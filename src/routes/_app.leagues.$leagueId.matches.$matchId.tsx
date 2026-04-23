@@ -362,9 +362,30 @@ function MatchScoringPage() {
             {local.sides[(local.winner_side ?? 1) === 1 ? 1 : 0].score}.
           </p>
           <p className="mt-2 text-xs uppercase tracking-wider text-muted-foreground">
-            Next: players confirm result
+            {local.status === "confirmed"
+              ? "Result confirmed by all players"
+              : local.status === "disputed"
+                ? "Result disputed — needs resolution"
+                : "Next: players confirm result"}
           </p>
         </div>
+      )}
+
+      {/* Confirmation flow (post-match) */}
+      {isComplete && (
+        <ConfirmationPanel
+          matchId={local.id}
+          matchStatus={local.status}
+          participants={local.sides.flatMap((s) =>
+            s.players.map((p) => ({
+              user_id: p.user_id,
+              display_name: p.display_name,
+              side_number: s.side_number,
+            })),
+          )}
+          currentUserId={user?.id ?? null}
+          onStatusChange={(next) => setLocal((prev) => (prev ? { ...prev, status: next } : prev))}
+        />
       )}
 
       {/* Two-column score panel */}

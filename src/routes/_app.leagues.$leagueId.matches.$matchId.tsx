@@ -141,7 +141,10 @@ function MatchScoringPage() {
   const canScore = isLive && !isComplete;
 
   // ---- Mutations (optimistic) ----
-  const updateSide = async (sideIdx: 0 | 1, patch: Partial<SideState>) => {
+  type SidePatch = Partial<
+    Pick<SideState, "score" | "extra_strokes_received" | "extra_strokes_used">
+  >;
+  const updateSide = async (sideIdx: 0 | 1, patch: SidePatch) => {
     if (!local) return;
     const sides = [...local.sides] as [SideState, SideState];
     sides[sideIdx] = { ...sides[sideIdx], ...patch };

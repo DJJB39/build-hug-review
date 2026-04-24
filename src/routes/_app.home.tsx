@@ -155,14 +155,25 @@ function HomePage() {
         )}
       </section>
 
-      {/* Floating record-match CTA */}
-      <Link
-        to="/leagues"
-        className="tap fixed bottom-[calc(80px+env(safe-area-inset-bottom))] right-5 z-30 inline-flex items-center gap-2 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 md:bottom-8"
-      >
-        <Plus className="size-4" aria-hidden />
-        Record a match
-      </Link>
+      {/* Floating record-match CTA — only shown when the user has at least one league */}
+      {leagues.length === 1 ? (
+        <Link
+          to="/leagues/$leagueId/matches/new"
+          params={{ leagueId: leagues[0].id }}
+          className="tap fixed bottom-[calc(80px+env(safe-area-inset-bottom))] right-5 z-30 inline-flex items-center gap-2 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 md:bottom-8"
+        >
+          <Plus className="size-4" aria-hidden />
+          Record a match
+        </Link>
+      ) : leagues.length > 1 ? (
+        <Link
+          to="/leagues"
+          className="tap fixed bottom-[calc(80px+env(safe-area-inset-bottom))] right-5 z-30 inline-flex items-center gap-2 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 md:bottom-8"
+        >
+          <Plus className="size-4" aria-hidden />
+          Record a match
+        </Link>
+      ) : null}
     </div>
   );
 }

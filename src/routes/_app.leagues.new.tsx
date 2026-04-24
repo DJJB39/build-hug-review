@@ -22,6 +22,11 @@ const DISCIPLINE_LABEL: Record<Discipline, string> = {
   ac: "Association Croquet (AC)",
 };
 
+const DISCIPLINE_HINT: Record<Discipline, string> = {
+  gc: "Hoop-by-hoop · most common in club play.",
+  ac: "Long-form · break-building.",
+};
+
 function NewLeaguePage() {
   const navigate = useNavigate();
   const { user } = useAuth();

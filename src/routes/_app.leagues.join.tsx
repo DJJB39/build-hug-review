@@ -31,13 +31,12 @@ function JoinLeaguePage() {
     setError(null);
 
     try {
-      // 1. Look up league by join code (case-insensitive via uppercased input).
-      const { data: league, error: lErr } = await supabase
-        .from("leagues")
-        .select("id, name")
-        .eq("join_code", trimmed)
-        .maybeSingle();
+      // 1. Look up league by join code via SECURITY DEFINER RPC so the
+      //    invite code itself never has to be readable to non-members.
+      const { data: lookup, error: lErr } = await supabase
+        .rpc("find_league_by_join_code", { _join_code: trimmed });
       if (lErr) throw lErr;
+      const league = Array.isArray(lookup) ? lookup[0] : null;
       if (!league) {
         const msg = "League not found. Check the code and try again.";
         setError(msg);

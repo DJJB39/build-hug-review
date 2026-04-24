@@ -99,7 +99,8 @@ function NewLeaguePage() {
     setError(null);
 
     try {
-      // 1. Insert league with chosen discipline. join_code is auto-generated.
+      // 1. Insert league. A database trigger automatically adds the owner
+      //    as an admin member, and join_code is auto-generated.
       const { data: league, error: lErr } = await supabase
         .from("leagues")
         .insert({
@@ -114,17 +115,7 @@ function NewLeaguePage() {
       if (lErr) throw lErr;
       if (!league) throw new Error("League could not be created.");
 
-      // 2. Insert admin membership (no trigger attached). Swallow duplicates.
-      const { error: mErr } = await supabase.from("league_members").insert({
-        league_id: league.id,
-        user_id: user.id,
-        role: "admin",
-      });
-      if (mErr && mErr.code !== "23505") {
-        throw mErr;
-      }
-
-      // 3. Update the matching profile handicap if it changed. Non-blocking.
+      // 2. Update the matching profile handicap if it changed. Non-blocking.
       const currentProfileValue = discipline === "gc" ? profileGc : profileAc;
       if (currentProfileValue === null || activeHandicapNum !== currentProfileValue) {
         const patch =

@@ -42,12 +42,25 @@ function LeagueDetail() {
       const { data, error } = await supabase
         .from("leagues")
         .select(
-          "id, name, description, format, discipline, target_score, status, join_code, owner_id",
+          "id, name, description, format, discipline, target_score, status, owner_id",
         )
         .eq("id", leagueId)
         .maybeSingle();
       if (error) throw error;
       return data;
+    },
+  });
+
+  // Join code is restricted to admins/owner via a SECURITY DEFINER RPC.
+  // Non-admin members will simply receive null.
+  const { data: joinCode } = useQuery({
+    queryKey: ["league-join-code", leagueId],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("get_league_join_code", {
+        _league_id: leagueId,
+      });
+      if (error) throw error;
+      return (data as string | null) ?? null;
     },
   });
 
@@ -119,9 +132,9 @@ function LeagueDetail() {
 
   const [copied, setCopied] = React.useState(false);
   async function copyJoinCode() {
-    if (!league?.join_code) return;
+    if (!joinCode) return;
     try {
-      await navigator.clipboard.writeText(league.join_code);
+      await navigator.clipboard.writeText(joinCode);
       setCopied(true);
       toast.success("Join code copied");
       setTimeout(() => setCopied(false), 1500);
@@ -171,7 +184,7 @@ function LeagueDetail() {
           </div>
 
           {/* Join code (admin only) */}
-          {isAdmin && (
+          {isAdmin && joinCode && (
             <section className="mt-6 rounded-xl border border-border bg-card p-4">
               <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Invite players
@@ -179,7 +192,7 @@ function LeagueDetail() {
               <div className="mt-2 flex items-center justify-between gap-3">
                 <div>
                   <div className="font-display text-2xl tabular tracking-widest text-foreground">
-                    {league.join_code}
+                    {joinCode}
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">
                     Share this code · they enter it on Join a league.

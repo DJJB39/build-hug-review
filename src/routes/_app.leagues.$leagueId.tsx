@@ -42,12 +42,25 @@ function LeagueDetail() {
       const { data, error } = await supabase
         .from("leagues")
         .select(
-          "id, name, description, format, discipline, target_score, status, join_code, owner_id",
+          "id, name, description, format, discipline, target_score, status, owner_id",
         )
         .eq("id", leagueId)
         .maybeSingle();
       if (error) throw error;
       return data;
+    },
+  });
+
+  // Join code is restricted to admins/owner via a SECURITY DEFINER RPC.
+  // Non-admin members will simply receive null.
+  const { data: joinCode } = useQuery({
+    queryKey: ["league-join-code", leagueId],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("get_league_join_code", {
+        _league_id: leagueId,
+      });
+      if (error) throw error;
+      return (data as string | null) ?? null;
     },
   });
 

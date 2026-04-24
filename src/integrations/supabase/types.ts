@@ -382,6 +382,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      find_league_by_join_code: {
+        Args: { _join_code: string }
+        Returns: {
+          id: string
+          name: string
+        }[]
+      }
       generate_join_code: { Args: never; Returns: string }
       get_league_join_code: { Args: { _league_id: string }; Returns: string }
       has_role: {

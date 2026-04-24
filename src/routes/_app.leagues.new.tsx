@@ -228,9 +228,14 @@ function NewLeaguePage() {
                       : "border-input text-foreground hover:bg-accent",
                   )}
                 >
-                  <span className="font-medium">{DISCIPLINE_LABEL[d]}</span>
+                  <div className="min-w-0">
+                    <div className="font-medium">{DISCIPLINE_LABEL[d]}</div>
+                    <div className="mt-0.5 text-xs text-muted-foreground">
+                      {DISCIPLINE_HINT[d]}
+                    </div>
+                  </div>
                   {selected && (
-                    <span className="flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                    <span className="ml-3 flex size-5 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
                       <Check className="size-3.5" aria-hidden />
                     </span>
                   )}

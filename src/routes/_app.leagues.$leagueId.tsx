@@ -132,9 +132,9 @@ function LeagueDetail() {
 
   const [copied, setCopied] = React.useState(false);
   async function copyJoinCode() {
-    if (!league?.join_code) return;
+    if (!joinCode) return;
     try {
-      await navigator.clipboard.writeText(league.join_code);
+      await navigator.clipboard.writeText(joinCode);
       setCopied(true);
       toast.success("Join code copied");
       setTimeout(() => setCopied(false), 1500);
@@ -184,7 +184,7 @@ function LeagueDetail() {
           </div>
 
           {/* Join code (admin only) */}
-          {isAdmin && (
+          {isAdmin && joinCode && (
             <section className="mt-6 rounded-xl border border-border bg-card p-4">
               <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Invite players
@@ -192,7 +192,7 @@ function LeagueDetail() {
               <div className="mt-2 flex items-center justify-between gap-3">
                 <div>
                   <div className="font-display text-2xl tabular tracking-widest text-foreground">
-                    {league.join_code}
+                    {joinCode}
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">
                     Share this code · they enter it on Join a league.

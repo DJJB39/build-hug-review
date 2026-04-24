@@ -52,7 +52,7 @@ function AccountCard() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, display_name, club, gc_handicap, gc_index")
+        .select("id, display_name, club, gc_handicap, ac_handicap, gc_index")
         .eq("id", user!.id)
         .maybeSingle();
       if (error) throw error;
@@ -71,33 +71,48 @@ function AccountCard() {
     return {
       fullName: profile?.display_name ?? metaName ?? "",
       club: profile?.club ?? "",
-      handicap: profile?.gc_handicap ?? 12,
+      gcHandicap: profile?.gc_handicap ?? 12,
+      acHandicap: profile?.ac_handicap ?? 12,
       index: profile?.gc_index ?? 1200,
     };
   }, [profile, user]);
 
   const [fullName, setFullName] = React.useState("");
   const [club, setClub] = React.useState("");
-  const [handicap, setHandicap] = React.useState<number | "">(12);
+  const [gcHandicap, setGcHandicap] = React.useState<number | "">(12);
+  const [acHandicap, setAcHandicap] = React.useState<number | "">(12);
   const [busy, setBusy] = React.useState(false);
 
   // Hydrate fields when initial values load.
   React.useEffect(() => {
     setFullName(initial.fullName);
     setClub(initial.club);
-    setHandicap(initial.handicap);
+    setGcHandicap(initial.gcHandicap);
+    setAcHandicap(initial.acHandicap);
   }, [initial]);
 
-  const handicapNum = handicap === "" ? Number.NaN : Number(handicap);
-  const handicapInvalid =
-    handicap !== "" && (Number.isNaN(handicapNum) || handicapNum < 0 || handicapNum > 36);
+  function isValidHandicap(value: number | "") {
+    if (value === "") return false;
+    const n = Number(value);
+    return Number.isInteger(n) && n >= -3 && n <= 24;
+  }
+
+  const gcInvalid = gcHandicap !== "" && !isValidHandicap(gcHandicap);
+  const acInvalid = acHandicap !== "" && !isValidHandicap(acHandicap);
 
   const dirty =
     fullName.trim() !== initial.fullName ||
     (club.trim() || "") !== (initial.club || "") ||
-    (handicap !== "" && handicapNum !== initial.handicap);
+    (gcHandicap !== "" && Number(gcHandicap) !== initial.gcHandicap) ||
+    (acHandicap !== "" && Number(acHandicap) !== initial.acHandicap);
 
-  const canSave = dirty && !handicapInvalid && fullName.trim().length > 0 && handicap !== "";
+  const canSave =
+    dirty &&
+    !gcInvalid &&
+    !acInvalid &&
+    fullName.trim().length > 0 &&
+    gcHandicap !== "" &&
+    acHandicap !== "";
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -110,13 +125,14 @@ function AccountCard() {
       });
       if (aErr) throw aErr;
 
-      // 2. Profile row (display_name, club, gc_handicap)
+      // 2. Profile row (display_name, club, gc_handicap, ac_handicap)
       const { error: pErr } = await supabase
         .from("profiles")
         .update({
           display_name: fullName.trim(),
           club: club.trim() || null,
-          gc_handicap: handicapNum,
+          gc_handicap: Number(gcHandicap),
+          ac_handicap: Number(acHandicap),
         })
         .eq("id", user.id);
       if (pErr) throw pErr;
@@ -134,7 +150,7 @@ function AccountCard() {
     <div className="rounded-xl border border-border bg-card p-4">
       <div className="font-medium text-foreground">Account</div>
       <div className="mt-0.5 text-sm text-muted-foreground">
-        Edit your name, club, and handicap.
+        Edit your name, club, and handicaps.
       </div>
 
       {isLoading ? (
@@ -169,39 +185,66 @@ function AccountCard() {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label htmlFor="handicap">GC handicap</Label>
+              <Label htmlFor="gc-handicap">GC handicap</Label>
               <Input
-                id="handicap"
+                id="gc-handicap"
                 type="number"
-                min={0}
-                max={36}
+                min={-3}
+                max={24}
                 step={1}
                 inputMode="numeric"
-                value={handicap}
+                value={gcHandicap}
                 onChange={(e) => {
                   const v = e.target.value;
-                  setHandicap(v === "" ? "" : Number(v));
+                  setGcHandicap(v === "" ? "" : Number(v));
                 }}
                 className="tap tabular"
-                aria-invalid={handicapInvalid}
+                aria-invalid={gcInvalid}
               />
-              {handicapInvalid && (
+              {gcInvalid && (
                 <p className="text-xs font-medium text-destructive">
-                  Handicap must be between 0 and 36.
+                  Whole number from −3 to 24.
                 </p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="index">Index</Label>
+              <Label htmlFor="ac-handicap">AC handicap</Label>
               <Input
-                id="index"
+                id="ac-handicap"
                 type="number"
-                value={initial.index}
-                readOnly
-                className="tap tabular bg-muted/40"
+                min={-3}
+                max={24}
+                step={1}
+                inputMode="numeric"
+                value={acHandicap}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setAcHandicap(v === "" ? "" : Number(v));
+                }}
+                className="tap tabular"
+                aria-invalid={acInvalid}
               />
+              {acInvalid && (
+                <p className="text-xs font-medium text-destructive">
+                  Whole number from −3 to 24.
+                </p>
+              )}
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="index">Index</Label>
+            <Input
+              id="index"
+              type="number"
+              value={initial.index}
+              readOnly
+              className="tap tabular bg-muted/40"
+            />
+            <p className="text-xs text-muted-foreground">
+              Updated automatically as you play matches.
+            </p>
           </div>
 
           <Button type="submit" disabled={!canSave || busy} className="tap w-full text-base">

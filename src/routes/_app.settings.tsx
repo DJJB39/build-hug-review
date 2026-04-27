@@ -1,6 +1,7 @@
 import * as React from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/lib/auth/AuthProvider";
@@ -11,8 +12,18 @@ import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/_app/settings")({
   head: () => ({ meta: [{ title: "Settings · Bisque" }] }),
-  component: SettingsPage,
+  component: SettingsRoute,
 });
+
+function SettingsRoute() {
+  const location = useLocation();
+
+  if (location.pathname !== "/settings") {
+    return <Outlet />;
+  }
+
+  return <SettingsPage />;
+}
 
 function SettingsPage() {
   const { user, signOut } = useAuth();
@@ -26,9 +37,17 @@ function SettingsPage() {
 
       <section className="mt-8 space-y-3">
         <AccountCard />
-        <SettingsRow title="Notifications" body="Match results, confirmations, league activity." />
-        <SettingsRow title="Appearance" body="Light, dark, follow system." />
-        <SettingsRow title="Privacy & data" body="Export your data, delete your account." />
+        <SettingsRow
+          to="/settings/notifications"
+          title="Notifications"
+          body="Match results, confirmations, league activity."
+        />
+        <SettingsRow to="/settings/appearance" title="Appearance" body="Light, dark, follow system." />
+        <SettingsRow
+          to="/settings/privacy"
+          title="Privacy & data"
+          body="Export your data, delete your account."
+        />
       </section>
 
       <button
@@ -256,14 +275,18 @@ function AccountCard() {
   );
 }
 
-function SettingsRow({ title, body }: { title: string; body: string }) {
+function SettingsRow({ to, title, body }: { to: "/settings/notifications" | "/settings/appearance" | "/settings/privacy"; title: string; body: string }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-4">
-      <div className="font-medium text-foreground">{title}</div>
-      <div className="mt-0.5 text-sm text-muted-foreground">{body}</div>
-      <div className="mt-2 text-[10px] font-medium uppercase tracking-wider text-primary">
-        Coming soon
+    <Link
+      to={to}
+      className="tap flex items-center gap-4 rounded-xl border border-border bg-card p-4 transition-colors hover:bg-accent/40"
+    >
+      <div className="min-w-0 flex-1">
+        <div className="font-medium text-foreground">{title}</div>
+        <div className="mt-0.5 text-sm text-muted-foreground">{body}</div>
+        <div className="mt-2 text-[10px] font-medium uppercase tracking-wider text-primary">Open</div>
       </div>
-    </div>
+      <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+    </Link>
   );
 }

@@ -1,57 +1,66 @@
-# Fix the Leagues empty-state actions
+# Make the Settings sections real pages
 
-I reviewed the Leagues page and the related route files. The three visible controls are currently rendered as route links:
+I checked the current app and the earlier prompts. We did implement the **Account** section only, and the prompt at the time explicitly said to leave **Notifications**, **Appearance**, and **Privacy & data** as “COMING SOON”. So those three pages were not created yet. Current registered route list only contains `/settings`, with no `/settings/notifications`, `/settings/appearance`, or `/settings/privacy` child routes.
 
-- `Create league` → `/leagues/new`
-- `Join with code` → `/leagues/join`
-- `New` → `/leagues/new`
+## What I’ll change
 
-The route files for both `/leagues/new` and `/leagues/join` exist, so the likely issue is interaction/routing behavior rather than missing pages. The `New` button is also redundant with the empty-state `Create league` action.
+### 1. Turn the three Settings cards into working links
+Edit `src/routes/_app.settings.tsx` so these cards are no longer static “Coming soon” blocks:
 
-## Changes to make
+- Notifications → `/settings/notifications`
+- Appearance → `/settings/appearance`
+- Privacy & data → `/settings/privacy`
 
-### 1. Remove the duplicate `New` button
-Edit `src/routes/_app.leagues.tsx` so the header only shows:
+They will keep the existing card styling and mobile tap target behavior, but show a clear affordance like “Open” instead of “COMING SOON”.
 
-- `Join with code`
+### 2. Add `/settings/notifications`
+Create a dedicated notifications settings page with:
 
-When the user has no leagues, the primary `Create league` button remains in the empty state. This avoids two competing ways to do the same thing.
+- Back link to Settings
+- Match results toggle
+- Match confirmations toggle
+- League activity toggle
+- Save button
+- Toast feedback on save
 
-### 2. Make `Join with code` mobile-friendly and explicit
-Update the header action layout in `src/routes/_app.leagues.tsx` so `Join with code` behaves like a proper full tap target on small screens:
+If no persistence table exists yet, I’ll keep these preferences local in the user profile metadata or a lightweight profile-backed settings field if already available. If a new database field/table is required, I’ll add it with safe per-user access rules.
 
-- Keep it as a TanStack Router `<Link>` to `/leagues/join`
-- Use the existing `tap` helper
-- Avoid cramped wrapping where possible
-- Keep the visual hierarchy secondary to `Create league`
+### 3. Add `/settings/appearance`
+Create an appearance settings page with:
 
-### 3. Make the empty-state `Create league` action unmistakably functional
-Update the empty-state CTA in `src/routes/_app.leagues.tsx` to keep it as the single primary action:
+- Back link to Settings
+- Light / Dark / Follow system option
+- Immediate preview where practical
+- Save button and toast feedback
 
-- `<Link to="/leagues/new">Create league</Link>`
-- Strong primary styling
-- Full, reliable tap target on mobile
+I’ll check the current theme implementation first and wire this into the existing styling approach rather than redesigning the app.
 
-### 4. Add defensive diagnostics for the league creation/join routes
-Review and tighten the entry behavior of:
+### 4. Add `/settings/privacy`
+Create a Privacy & data page with usable actions:
 
-- `src/routes/_app.leagues.new.tsx`
-- `src/routes/_app.leagues.join.tsx`
+- Export your data action, using the existing export helper if applicable
+- Clear explanation of what is included
+- Delete account section presented as a dangerous action
 
-The goal is to ensure if navigation succeeds but backend submission fails, the user sees a clear error rather than thinking the button did nothing. I’ll keep the form fields filled on errors.
+For deletion, I will not add a fake or unsafe client-only delete. If account deletion needs backend support, I’ll implement it through the app backend with proper authenticated validation, or present it as a disabled/actionable section if the backend route cannot be safely completed in this pass.
 
 ## Technical notes
 
-- No database changes are expected.
-- No route tree edits; TanStack generates that automatically.
-- Use typed TanStack Router links, not string interpolation.
-- Only code paths related to the Leagues list, Create League page, and Join League page will be touched.
+- Use TanStack Start route files:
+  - `src/routes/_app.settings.notifications.tsx`
+  - `src/routes/_app.settings.appearance.tsx`
+  - `src/routes/_app.settings.privacy.tsx`
+- Use `@tanstack/react-router` `Link` components, not plain anchors.
+- Do not edit generated route files manually.
+- Keep the current Settings visual style shown in your screenshot: same cards, spacing, typography, and colors.
+- If persistent notification/appearance preferences require backend changes, add a secure migration with per-user access.
 
 ## Verification
 
-After implementation I will verify:
+After implementation I’ll verify:
 
-1. On `/leagues`, tapping `Create league` opens `/leagues/new`.
-2. On `/leagues`, tapping `Join with code` opens `/leagues/join`.
-3. The duplicate `New` button is gone.
-4. The create and join forms still submit with visible success/error feedback.
+1. `/settings` cards are tappable on mobile and desktop.
+2. Each card routes to the correct page and renders content, not a dead page.
+3. Back navigation returns to `/settings`.
+4. Save actions give visible feedback.
+5. Any backend-backed preferences are scoped to the signed-in user only.

@@ -54,12 +54,6 @@ function AppearanceSettingsPage() {
     applyTheme(next);
   }, [settingsQuery.data]);
 
-  React.useEffect(() => {
-    const saved = parseTheme(window.localStorage.getItem("bisque.appearance"));
-    if (settingsQuery.data || !user || saved === "system") return;
-    setTheme(saved);
-    applyTheme(saved);
-  }, [settingsQuery.data, user]);
 
   function choose(next: ThemeChoice) {
     setTheme(next);
@@ -81,7 +75,6 @@ function AppearanceSettingsPage() {
         ? await supabase.from("user_settings").update({ appearance_theme: theme }).eq("user_id", user.id)
         : await supabase.from("user_settings").insert({ user_id: user.id, appearance_theme: theme });
       if (error) throw error;
-      window.localStorage.removeItem("bisque.appearance");
       setInitial(theme);
       qc.invalidateQueries({ queryKey: ["user-settings", user.id] });
       toast.success("Appearance settings saved");

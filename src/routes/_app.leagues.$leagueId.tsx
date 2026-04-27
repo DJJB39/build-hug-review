@@ -1,5 +1,5 @@
 import * as React from "react";
-import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useLocation, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ArrowUpRight, Check, Copy, Plus, Users } from "lucide-react";
 import { toast } from "sonner";
@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/leagues/$leagueId")({
   head: () => ({ meta: [{ title: "League · Bisque" }] }),
-  component: LeagueDetail,
+  component: LeagueRoute,
 });
 
 interface MemberWithProfile {
@@ -30,6 +30,17 @@ interface MatchRow {
   created_at: string;
   ended_at: string | null;
   scores: { side_number: number; score: number }[];
+}
+
+function LeagueRoute() {
+  const location = useLocation();
+  const { leagueId } = useParams({ from: "/_app/leagues/$leagueId" });
+
+  if (location.pathname !== `/leagues/${leagueId}`) {
+    return <Outlet />;
+  }
+
+  return <LeagueDetail />;
 }
 
 function LeagueDetail() {

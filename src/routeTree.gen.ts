@@ -19,6 +19,8 @@ import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppLeaguesRouteImport } from './routes/_app.leagues'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
+import { Route as AppSettingsNotificationsRouteImport } from './routes/_app.settings.notifications'
+import { Route as AppSettingsAppearanceRouteImport } from './routes/_app.settings.appearance'
 import { Route as AppLeaguesNewRouteImport } from './routes/_app.leagues.new'
 import { Route as AppLeaguesJoinRouteImport } from './routes/_app.leagues.join'
 import { Route as AppLeaguesLeagueIdRouteImport } from './routes/_app.leagues.$leagueId'
@@ -74,6 +76,17 @@ const AppHomeRoute = AppHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => AppRoute,
 } as any)
+const AppSettingsNotificationsRoute =
+  AppSettingsNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AppSettingsRoute,
+  } as any)
+const AppSettingsAppearanceRoute = AppSettingsAppearanceRouteImport.update({
+  id: '/appearance',
+  path: '/appearance',
+  getParentRoute: () => AppSettingsRoute,
+} as any)
 const AppLeaguesNewRoute = AppLeaguesNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -111,10 +124,12 @@ export interface FileRoutesByFullPath {
   '/home': typeof AppHomeRoute
   '/leagues': typeof AppLeaguesRouteWithChildren
   '/profile': typeof AppProfileRoute
-  '/settings': typeof AppSettingsRoute
+  '/settings': typeof AppSettingsRouteWithChildren
   '/leagues/$leagueId': typeof AppLeaguesLeagueIdRouteWithChildren
   '/leagues/join': typeof AppLeaguesJoinRoute
   '/leagues/new': typeof AppLeaguesNewRoute
+  '/settings/appearance': typeof AppSettingsAppearanceRoute
+  '/settings/notifications': typeof AppSettingsNotificationsRoute
   '/leagues/$leagueId/matches/$matchId': typeof AppLeaguesLeagueIdMatchesMatchIdRoute
   '/leagues/$leagueId/matches/new': typeof AppLeaguesLeagueIdMatchesNewRoute
 }
@@ -127,10 +142,12 @@ export interface FileRoutesByTo {
   '/home': typeof AppHomeRoute
   '/leagues': typeof AppLeaguesRouteWithChildren
   '/profile': typeof AppProfileRoute
-  '/settings': typeof AppSettingsRoute
+  '/settings': typeof AppSettingsRouteWithChildren
   '/leagues/$leagueId': typeof AppLeaguesLeagueIdRouteWithChildren
   '/leagues/join': typeof AppLeaguesJoinRoute
   '/leagues/new': typeof AppLeaguesNewRoute
+  '/settings/appearance': typeof AppSettingsAppearanceRoute
+  '/settings/notifications': typeof AppSettingsNotificationsRoute
   '/leagues/$leagueId/matches/$matchId': typeof AppLeaguesLeagueIdMatchesMatchIdRoute
   '/leagues/$leagueId/matches/new': typeof AppLeaguesLeagueIdMatchesNewRoute
 }
@@ -145,10 +162,12 @@ export interface FileRoutesById {
   '/_app/home': typeof AppHomeRoute
   '/_app/leagues': typeof AppLeaguesRouteWithChildren
   '/_app/profile': typeof AppProfileRoute
-  '/_app/settings': typeof AppSettingsRoute
+  '/_app/settings': typeof AppSettingsRouteWithChildren
   '/_app/leagues/$leagueId': typeof AppLeaguesLeagueIdRouteWithChildren
   '/_app/leagues/join': typeof AppLeaguesJoinRoute
   '/_app/leagues/new': typeof AppLeaguesNewRoute
+  '/_app/settings/appearance': typeof AppSettingsAppearanceRoute
+  '/_app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/_app/leagues/$leagueId/matches/$matchId': typeof AppLeaguesLeagueIdMatchesMatchIdRoute
   '/_app/leagues/$leagueId/matches/new': typeof AppLeaguesLeagueIdMatchesNewRoute
 }
@@ -167,6 +186,8 @@ export interface FileRouteTypes {
     | '/leagues/$leagueId'
     | '/leagues/join'
     | '/leagues/new'
+    | '/settings/appearance'
+    | '/settings/notifications'
     | '/leagues/$leagueId/matches/$matchId'
     | '/leagues/$leagueId/matches/new'
   fileRoutesByTo: FileRoutesByTo
@@ -183,6 +204,8 @@ export interface FileRouteTypes {
     | '/leagues/$leagueId'
     | '/leagues/join'
     | '/leagues/new'
+    | '/settings/appearance'
+    | '/settings/notifications'
     | '/leagues/$leagueId/matches/$matchId'
     | '/leagues/$leagueId/matches/new'
   id:
@@ -200,6 +223,8 @@ export interface FileRouteTypes {
     | '/_app/leagues/$leagueId'
     | '/_app/leagues/join'
     | '/_app/leagues/new'
+    | '/_app/settings/appearance'
+    | '/_app/settings/notifications'
     | '/_app/leagues/$leagueId/matches/$matchId'
     | '/_app/leagues/$leagueId/matches/new'
   fileRoutesById: FileRoutesById
@@ -285,6 +310,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppHomeRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/settings/notifications': {
+      id: '/_app/settings/notifications'
+      path: '/notifications'
+      fullPath: '/settings/notifications'
+      preLoaderRoute: typeof AppSettingsNotificationsRouteImport
+      parentRoute: typeof AppSettingsRoute
+    }
+    '/_app/settings/appearance': {
+      id: '/_app/settings/appearance'
+      path: '/appearance'
+      fullPath: '/settings/appearance'
+      preLoaderRoute: typeof AppSettingsAppearanceRouteImport
+      parentRoute: typeof AppSettingsRoute
+    }
     '/_app/leagues/new': {
       id: '/_app/leagues/new'
       path: '/new'
@@ -352,18 +391,32 @@ const AppLeaguesRouteWithChildren = AppLeaguesRoute._addFileChildren(
   AppLeaguesRouteChildren,
 )
 
+interface AppSettingsRouteChildren {
+  AppSettingsAppearanceRoute: typeof AppSettingsAppearanceRoute
+  AppSettingsNotificationsRoute: typeof AppSettingsNotificationsRoute
+}
+
+const AppSettingsRouteChildren: AppSettingsRouteChildren = {
+  AppSettingsAppearanceRoute: AppSettingsAppearanceRoute,
+  AppSettingsNotificationsRoute: AppSettingsNotificationsRoute,
+}
+
+const AppSettingsRouteWithChildren = AppSettingsRoute._addFileChildren(
+  AppSettingsRouteChildren,
+)
+
 interface AppRouteChildren {
   AppHomeRoute: typeof AppHomeRoute
   AppLeaguesRoute: typeof AppLeaguesRouteWithChildren
   AppProfileRoute: typeof AppProfileRoute
-  AppSettingsRoute: typeof AppSettingsRoute
+  AppSettingsRoute: typeof AppSettingsRouteWithChildren
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppHomeRoute: AppHomeRoute,
   AppLeaguesRoute: AppLeaguesRouteWithChildren,
   AppProfileRoute: AppProfileRoute,
-  AppSettingsRoute: AppSettingsRoute,
+  AppSettingsRoute: AppSettingsRouteWithChildren,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

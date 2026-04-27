@@ -377,6 +377,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_settings: {
+        Row: {
+          appearance_theme: string
+          created_at: string
+          notify_league_activity: boolean
+          notify_match_confirmations: boolean
+          notify_match_results: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          appearance_theme?: string
+          created_at?: string
+          notify_league_activity?: boolean
+          notify_match_confirmations?: boolean
+          notify_match_results?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          appearance_theme?: string
+          created_at?: string
+          notify_league_activity?: boolean
+          notify_match_confirmations?: boolean
+          notify_match_results?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

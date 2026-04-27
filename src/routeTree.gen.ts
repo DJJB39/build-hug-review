@@ -19,6 +19,7 @@ import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppLeaguesRouteImport } from './routes/_app.leagues'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
+import { Route as AppSettingsPrivacyRouteImport } from './routes/_app.settings.privacy'
 import { Route as AppSettingsNotificationsRouteImport } from './routes/_app.settings.notifications'
 import { Route as AppSettingsAppearanceRouteImport } from './routes/_app.settings.appearance'
 import { Route as AppLeaguesNewRouteImport } from './routes/_app.leagues.new'
@@ -76,6 +77,11 @@ const AppHomeRoute = AppHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => AppRoute,
 } as any)
+const AppSettingsPrivacyRoute = AppSettingsPrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => AppSettingsRoute,
+} as any)
 const AppSettingsNotificationsRoute =
   AppSettingsNotificationsRouteImport.update({
     id: '/notifications',
@@ -130,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/leagues/new': typeof AppLeaguesNewRoute
   '/settings/appearance': typeof AppSettingsAppearanceRoute
   '/settings/notifications': typeof AppSettingsNotificationsRoute
+  '/settings/privacy': typeof AppSettingsPrivacyRoute
   '/leagues/$leagueId/matches/$matchId': typeof AppLeaguesLeagueIdMatchesMatchIdRoute
   '/leagues/$leagueId/matches/new': typeof AppLeaguesLeagueIdMatchesNewRoute
 }
@@ -148,6 +155,7 @@ export interface FileRoutesByTo {
   '/leagues/new': typeof AppLeaguesNewRoute
   '/settings/appearance': typeof AppSettingsAppearanceRoute
   '/settings/notifications': typeof AppSettingsNotificationsRoute
+  '/settings/privacy': typeof AppSettingsPrivacyRoute
   '/leagues/$leagueId/matches/$matchId': typeof AppLeaguesLeagueIdMatchesMatchIdRoute
   '/leagues/$leagueId/matches/new': typeof AppLeaguesLeagueIdMatchesNewRoute
 }
@@ -168,6 +176,7 @@ export interface FileRoutesById {
   '/_app/leagues/new': typeof AppLeaguesNewRoute
   '/_app/settings/appearance': typeof AppSettingsAppearanceRoute
   '/_app/settings/notifications': typeof AppSettingsNotificationsRoute
+  '/_app/settings/privacy': typeof AppSettingsPrivacyRoute
   '/_app/leagues/$leagueId/matches/$matchId': typeof AppLeaguesLeagueIdMatchesMatchIdRoute
   '/_app/leagues/$leagueId/matches/new': typeof AppLeaguesLeagueIdMatchesNewRoute
 }
@@ -188,6 +197,7 @@ export interface FileRouteTypes {
     | '/leagues/new'
     | '/settings/appearance'
     | '/settings/notifications'
+    | '/settings/privacy'
     | '/leagues/$leagueId/matches/$matchId'
     | '/leagues/$leagueId/matches/new'
   fileRoutesByTo: FileRoutesByTo
@@ -206,6 +216,7 @@ export interface FileRouteTypes {
     | '/leagues/new'
     | '/settings/appearance'
     | '/settings/notifications'
+    | '/settings/privacy'
     | '/leagues/$leagueId/matches/$matchId'
     | '/leagues/$leagueId/matches/new'
   id:
@@ -225,6 +236,7 @@ export interface FileRouteTypes {
     | '/_app/leagues/new'
     | '/_app/settings/appearance'
     | '/_app/settings/notifications'
+    | '/_app/settings/privacy'
     | '/_app/leagues/$leagueId/matches/$matchId'
     | '/_app/leagues/$leagueId/matches/new'
   fileRoutesById: FileRoutesById
@@ -310,6 +322,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppHomeRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/settings/privacy': {
+      id: '/_app/settings/privacy'
+      path: '/privacy'
+      fullPath: '/settings/privacy'
+      preLoaderRoute: typeof AppSettingsPrivacyRouteImport
+      parentRoute: typeof AppSettingsRoute
+    }
     '/_app/settings/notifications': {
       id: '/_app/settings/notifications'
       path: '/notifications'
@@ -394,11 +413,13 @@ const AppLeaguesRouteWithChildren = AppLeaguesRoute._addFileChildren(
 interface AppSettingsRouteChildren {
   AppSettingsAppearanceRoute: typeof AppSettingsAppearanceRoute
   AppSettingsNotificationsRoute: typeof AppSettingsNotificationsRoute
+  AppSettingsPrivacyRoute: typeof AppSettingsPrivacyRoute
 }
 
 const AppSettingsRouteChildren: AppSettingsRouteChildren = {
   AppSettingsAppearanceRoute: AppSettingsAppearanceRoute,
   AppSettingsNotificationsRoute: AppSettingsNotificationsRoute,
+  AppSettingsPrivacyRoute: AppSettingsPrivacyRoute,
 }
 
 const AppSettingsRouteWithChildren = AppSettingsRoute._addFileChildren(

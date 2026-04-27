@@ -3,7 +3,8 @@ import { ArrowLeft, Download } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { downloadProjectMarkdown } from "@/lib/export/exportProjectMarkdown";
+import { useAuth } from "@/lib/auth/AuthProvider";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_app/settings/privacy")({
   head: () => ({ meta: [{ title: "Privacy & data · Bisque" }] }),
@@ -11,8 +12,48 @@ export const Route = createFileRoute("/_app/settings/privacy")({
 });
 
 function PrivacySettingsPage() {
-  function exportData() {
-    downloadProjectMarkdown("bisque-data-export.md");
+  const { user } = useAuth();
+
+  async function exportData() {
+    if (!user) return;
+
+    const [profile, memberships, leagues, matches, confirmations, handicapEvents] = await Promise.all([
+      supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
+      supabase.from("league_members").select("*").eq("user_id", user.id),
+      supabase.from("leagues").select("*"),
+      supabase.from("matches").select("*"),
+      supabase.from("match_confirmations").select("*"),
+      supabase.from("handicap_events").select("*"),
+    ]);
+
+    const firstError = [profile, memberships, leagues, matches, confirmations, handicapEvents].find(
+      (result) => result.error,
+    )?.error;
+    if (firstError) {
+      toast.error(firstError.message);
+      return;
+    }
+
+    const payload = {
+      exported_at: new Date().toISOString(),
+      account: { id: user.id, email: user.email },
+      profile: profile.data,
+      memberships: memberships.data ?? [],
+      visible_leagues: leagues.data ?? [],
+      visible_matches: matches.data ?? [],
+      match_confirmations: confirmations.data ?? [],
+      handicap_events: handicapEvents.data ?? [],
+    };
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "bisque-data-export.json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1_000);
     toast.success("Export started");
   }
 
@@ -30,7 +71,7 @@ function PrivacySettingsPage() {
         <div className="rounded-xl border border-border bg-card p-4">
           <div className="font-medium text-foreground">Export data</div>
           <div className="mt-0.5 text-sm text-muted-foreground">
-            Download a Markdown export of the current Bisque project source and app configuration.
+            Download your profile, memberships, visible leagues, matches, confirmations, and handicap events.
           </div>
           <Button type="button" onClick={exportData} className="tap mt-5 w-full text-base">
             <Download className="size-4" aria-hidden /> Export data

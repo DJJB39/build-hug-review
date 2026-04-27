@@ -76,12 +76,21 @@ function NotificationsSettingsPage() {
     if (!user) return;
     setBusy(true);
     try {
-      const { error } = await supabase.from("user_settings").upsert({
-        user_id: user.id,
+      const { data: existing, error: readError } = await supabase
+        .from("user_settings")
+        .select("user_id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (readError) throw readError;
+
+      const payload = {
         notify_match_results: settings.matchResults,
         notify_match_confirmations: settings.matchConfirmations,
         notify_league_activity: settings.leagueActivity,
-      });
+      };
+      const { error } = existing
+        ? await supabase.from("user_settings").update(payload).eq("user_id", user.id)
+        : await supabase.from("user_settings").insert({ user_id: user.id, ...payload });
       if (error) throw error;
       window.localStorage.removeItem("bisque.notificationSettings");
       setInitial(settings);

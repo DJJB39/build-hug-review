@@ -25,6 +25,12 @@ export function PublicShell({ children, hideHeader = false, className }: PublicS
             </Link>
             <nav className="flex items-center gap-1 text-sm">
               <Link
+                to="/demo"
+                className="tap inline-flex items-center rounded-md px-3 text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Demo
+              </Link>
+              <Link
                 to="/help"
                 className="tap inline-flex items-center rounded-md px-3 text-muted-foreground transition-colors hover:text-foreground"
               >
@@ -53,6 +59,9 @@ export function PublicShell({ children, hideHeader = false, className }: PublicS
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-5 py-6 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} Bisque · Golf Croquet, tracked properly.</p>
           <div className="flex items-center gap-4">
+            <Link to="/demo" className="hover:text-foreground">
+              Demo
+            </Link>
             <Link to="/help" className="hover:text-foreground">
               Help
             </Link>

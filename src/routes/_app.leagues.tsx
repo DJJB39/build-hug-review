@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Plus, Users, Trophy, Archive } from "lucide-react";
 
@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_app/leagues")({
   head: () => ({ meta: [{ title: "Leagues · Bisque" }] }),
-  component: LeaguesPage,
+  component: LeaguesRoute,
 });
 
 interface LeagueListRow {
@@ -17,6 +17,16 @@ interface LeagueListRow {
   format: string;
   status: string;
   member_count?: number;
+}
+
+function LeaguesRoute() {
+  const location = useLocation();
+
+  if (location.pathname !== "/leagues") {
+    return <Outlet />;
+  }
+
+  return <LeaguesPage />;
 }
 
 function LeaguesPage() {

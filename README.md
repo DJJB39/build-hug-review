@@ -7,6 +7,7 @@ Bisque is built for the real rhythm of UK club croquet: create a league, invite 
 ## Live demo
 
 - Published app: https://build-hug-review.lovable.app
+- Public demo league: https://build-hug-review.lovable.app/demo
 - Lovable project: https://lovable.dev/projects/113f5643-63cf-4682-a608-b4908678278e
 
 > Frontend updates in Lovable need to be published from the Publish dialog. Backend/database changes apply automatically.

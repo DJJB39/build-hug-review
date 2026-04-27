@@ -46,6 +46,12 @@ function SplashPage() {
             <BisqueWordmark size="md" />
             <nav className="flex items-center gap-1 text-sm">
               <Link
+                to="/demo"
+                className="tap hidden items-center rounded-md px-3 text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
+              >
+                Demo
+              </Link>
+              <Link
                 to="/help"
                 className="tap hidden items-center rounded-md px-3 text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
               >
@@ -85,10 +91,10 @@ function SplashPage() {
                   Create your league
                 </Link>
                 <Link
-                  to="/login"
+                  to="/demo"
                   className="tap inline-flex items-center justify-center rounded-xl border border-border bg-card px-7 text-base font-medium text-foreground transition-colors hover:bg-accent"
                 >
-                  I already have an account
+                  View demo league
                 </Link>
               </div>
 
@@ -150,6 +156,9 @@ function SplashPage() {
             <span>© {new Date().getFullYear()} Bisque</span>
           </div>
           <div className="flex flex-wrap items-center gap-5">
+            <Link to="/demo" className="hover:text-foreground">
+              Demo
+            </Link>
             <Link to="/help" className="hover:text-foreground">
               Help
             </Link>

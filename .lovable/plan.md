@@ -1,58 +1,57 @@
+# Fix the Leagues empty-state actions
 
+I reviewed the Leagues page and the related route files. The three visible controls are currently rendered as route links:
 
-# Connect the existing pieces — make leagues and matches actually usable
+- `Create league` → `/leagues/new`
+- `Join with code` → `/leagues/join`
+- `New` → `/leagues/new`
 
-The match-creation and live-scoring pages already work. What's missing is the navigation between them and a few "Coming soon" labels that should now be "live". This is a wiring pass, not new features.
+The route files for both `/leagues/new` and `/leagues/join` exist, so the likely issue is interaction/routing behavior rather than missing pages. The `New` button is also redundant with the empty-state `Create league` action.
 
-## Changes
+## Changes to make
 
-### 1. `src/routes/_app.leagues.$leagueId.tsx` — the critical fix
+### 1. Remove the duplicate `New` button
+Edit `src/routes/_app.leagues.tsx` so the header only shows:
 
-Replace the placeholder with a real league hub:
-- **"+ New match" primary button** → `/leagues/$leagueId/matches/new`
-- **Members section** — list profiles from `league_members` joined with `profiles` (display_name, gc_handicap), showing the admin badge for the owner
-- **Recent matches section** — list `matches` for this league (most recent first), each linking to `/leagues/$leagueId/matches/$matchId`, showing match_type, target_score, status, and final score if present
-- **Join code + share** — show `join_code` with a copy-to-clipboard button (admin only)
-- Keep the discipline/format/target_score line that's already there
-- Remove the "next iteration" placeholder block
+- `Join with code`
 
-### 2. `src/routes/_app.home.tsx` — fix the broken CTA
+When the user has no leagues, the primary `Create league` button remains in the empty state. This avoids two competing ways to do the same thing.
 
-The floating "Record a match" button currently goes to `/leagues`, which is useless. Two options, I'll go with (a):
+### 2. Make `Join with code` mobile-friendly and explicit
+Update the header action layout in `src/routes/_app.leagues.tsx` so `Join with code` behaves like a proper full tap target on small screens:
 
-- **(a)** If the user has exactly one league, link straight to that league's `/matches/new`. If they have multiple, link to `/leagues` with a hint. If zero, hide the button and surface the "Create your first league" empty state more prominently.
-- (b) Always go to `/leagues` and call the button "Pick a league" — worse UX.
+- Keep it as a TanStack Router `<Link>` to `/leagues/join`
+- Use the existing `tap` helper
+- Avoid cramped wrapping where possible
+- Keep the visual hierarchy secondary to `Create league`
 
-### 3. `src/routes/_app.leagues.new.tsx` — finish the AC work
+### 3. Make the empty-state `Create league` action unmistakably functional
+Update the empty-state CTA in `src/routes/_app.leagues.tsx` to keep it as the single primary action:
 
-The AC migration shipped (`ac_handicap` column, `discipline` enum). Enable the AC radio button, remove the "Coming soon" hint. The form logic already handles both disciplines — only the disabled state needs removing.
+- `<Link to="/leagues/new">Create league</Link>`
+- Strong primary styling
+- Full, reliable tap target on mobile
 
-### 4. `src/routes/_app.settings.tsx` — fix the handicap range bug
+### 4. Add defensive diagnostics for the league creation/join routes
+Review and tighten the entry behavior of:
 
-Change min/max from `0..36` to `-3..24` to match the DB constraint and the rest of the app. Update the error message. Also surface `ac_handicap` alongside `gc_handicap` (the column exists; Settings ignores it).
+- `src/routes/_app.leagues.new.tsx`
+- `src/routes/_app.leagues.join.tsx`
 
-### 5. Honest "Coming soon" cleanup
+The goal is to ensure if navigation succeeds but backend submission fails, the user sees a clear error rather than thinking the button did nothing. I’ll keep the form fields filled on errors.
 
-Leave the three Settings rows (Notifications, Appearance, Privacy & data) and the Profile "Printable handicap card" labeled as Coming soon — those genuinely aren't built and shouldn't pretend otherwise. **Don't** silently remove them; they signal roadmap.
+## Technical notes
 
-## Out of scope for this pass
+- No database changes are expected.
+- No route tree edits; TanStack generates that automatically.
+- Use typed TanStack Router links, not string interpolation.
+- Only code paths related to the Leagues list, Create League page, and Join League page will be touched.
 
-- Leaderboards, head-to-head stats, fixtures (real feature work, separate task)
-- Notifications, theme switcher, data export (the three Settings rows)
-- Printable handicap card
-- Real handicap-event recalculation on match end (the current flow logs a no-op event — works but doesn't change handicaps)
+## Verification
 
-## Files touched
+After implementation I will verify:
 
-- **Edit:** `src/routes/_app.leagues.$leagueId.tsx` (full rewrite of the body)
-- **Edit:** `src/routes/_app.home.tsx` (CTA target logic)
-- **Edit:** `src/routes/_app.leagues.new.tsx` (enable AC radio)
-- **Edit:** `src/routes/_app.settings.tsx` (handicap range, add AC field)
-
-## Verification after shipping
-
-1. Sign in → Home → "Record a match" goes somewhere sensible
-2. Home → "Create your first league" → fill form → land on league detail → see "+ New match" button → reach the match form
-3. Create a match → score it → end it → confirmation panel appears
-4. Settings → save handicap of 20 (works) and 30 (rejected with clear error)
-
+1. On `/leagues`, tapping `Create league` opens `/leagues/new`.
+2. On `/leagues`, tapping `Join with code` opens `/leagues/join`.
+3. The duplicate `New` button is gone.
+4. The create and join forms still submit with visible success/error feedback.

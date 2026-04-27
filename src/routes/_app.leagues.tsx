@@ -41,7 +41,7 @@ function LeaguesPage() {
 
   return (
     <div className="mx-auto w-full max-w-3xl px-5 pb-12 pt-8 md:pt-12">
-      <header className="mb-8 flex items-end justify-between">
+      <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="font-display text-3xl font-medium tracking-tight text-foreground md:text-4xl">
             Leagues
@@ -50,20 +50,12 @@ function LeaguesPage() {
             Everything you're playing in, plus what you've put away.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Link
-            to="/leagues/join"
-            className="tap inline-flex items-center rounded-xl border border-input bg-background px-4 text-sm font-medium text-foreground transition-colors hover:bg-accent"
-          >
-            Join with code
-          </Link>
-          <Link
-            to="/leagues/new"
-            className="tap inline-flex items-center gap-1 rounded-xl bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            <Plus className="size-4" aria-hidden /> New
-          </Link>
-        </div>
+        <Link
+          to="/leagues/join"
+          className="tap inline-flex w-full items-center justify-center rounded-xl border border-input bg-background px-4 text-sm font-medium text-foreground transition-colors hover:bg-accent sm:w-auto"
+        >
+          Join with code
+        </Link>
       </header>
 
       {leaguesQuery.isLoading ? (
@@ -73,7 +65,9 @@ function LeaguesPage() {
           ))}
         </div>
       ) : leagues.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-lawn-grid bg-lawn-grid-fade p-10 text-center">
+        <div className="relative overflow-hidden rounded-2xl border border-dashed border-border p-10 text-center">
+          <div className="pointer-events-none absolute inset-0 bg-lawn-grid bg-lawn-grid-fade" aria-hidden />
+          <div className="relative z-10">
           <Trophy className="mx-auto size-8 text-primary" aria-hidden />
           <h3 className="mt-4 font-display text-lg font-medium text-foreground">No leagues yet</h3>
           <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
@@ -85,6 +79,7 @@ function LeaguesPage() {
           >
             <Plus className="mr-1 size-4" aria-hidden /> Create league
           </Link>
+          </div>
         </div>
       ) : (
         <>

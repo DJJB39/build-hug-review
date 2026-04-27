@@ -59,16 +59,6 @@ function NotificationsSettingsPage() {
     setInitial(next);
   }, [settingsQuery.data]);
 
-  React.useEffect(() => {
-    const raw = window.localStorage.getItem("bisque.notificationSettings");
-    if (!raw || settingsQuery.data || !user) return;
-    try {
-      const parsed = { ...DEFAULT_SETTINGS, ...JSON.parse(raw) } as NotificationSettings;
-      setSettings(parsed);
-    } catch {
-      window.localStorage.removeItem("bisque.notificationSettings");
-    }
-  }, [settingsQuery.data, user]);
 
   const dirty = JSON.stringify(settings) !== JSON.stringify(initial);
 
@@ -92,7 +82,6 @@ function NotificationsSettingsPage() {
         ? await supabase.from("user_settings").update(payload).eq("user_id", user.id)
         : await supabase.from("user_settings").insert({ user_id: user.id, ...payload });
       if (error) throw error;
-      window.localStorage.removeItem("bisque.notificationSettings");
       setInitial(settings);
       qc.invalidateQueries({ queryKey: ["user-settings", user.id] });
       toast.success("Notification settings saved");

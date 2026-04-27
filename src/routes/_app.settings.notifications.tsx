@@ -1,17 +1,18 @@
 import * as React from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { useAuth } from "@/lib/auth/AuthProvider";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_app/settings/notifications")({
   head: () => ({ meta: [{ title: "Notifications · Bisque" }] }),
   component: NotificationsSettingsPage,
 });
-
-const STORAGE_KEY = "bisque.notificationSettings";
 
 type NotificationSettings = {
   matchResults: boolean;
@@ -26,27 +27,71 @@ const DEFAULT_SETTINGS: NotificationSettings = {
 };
 
 function NotificationsSettingsPage() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
   const [settings, setSettings] = React.useState(DEFAULT_SETTINGS);
   const [initial, setInitial] = React.useState(DEFAULT_SETTINGS);
+  const [busy, setBusy] = React.useState(false);
+
+  const settingsQuery = useQuery({
+    queryKey: ["user-settings", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("user_settings")
+        .select("notify_match_results, notify_match_confirmations, notify_league_activity")
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
 
   React.useEffect(() => {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return;
+    const next = settingsQuery.data
+      ? {
+          matchResults: settingsQuery.data.notify_match_results,
+          matchConfirmations: settingsQuery.data.notify_match_confirmations,
+          leagueActivity: settingsQuery.data.notify_league_activity,
+        }
+      : DEFAULT_SETTINGS;
+    setSettings(next);
+    setInitial(next);
+  }, [settingsQuery.data]);
+
+  React.useEffect(() => {
+    const raw = window.localStorage.getItem("bisque.notificationSettings");
+    if (!raw || settingsQuery.data || !user) return;
     try {
       const parsed = { ...DEFAULT_SETTINGS, ...JSON.parse(raw) } as NotificationSettings;
       setSettings(parsed);
-      setInitial(parsed);
     } catch {
-      window.localStorage.removeItem(STORAGE_KEY);
+      window.localStorage.removeItem("bisque.notificationSettings");
     }
-  }, []);
+  }, [settingsQuery.data, user]);
 
   const dirty = JSON.stringify(settings) !== JSON.stringify(initial);
 
-  function save() {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-    setInitial(settings);
-    toast.success("Notification settings saved");
+  async function save() {
+    if (!user) return;
+    setBusy(true);
+    try {
+      const { error } = await supabase.from("user_settings").upsert({
+        user_id: user.id,
+        notify_match_results: settings.matchResults,
+        notify_match_confirmations: settings.matchConfirmations,
+        notify_league_activity: settings.leagueActivity,
+      });
+      if (error) throw error;
+      window.localStorage.removeItem("bisque.notificationSettings");
+      setInitial(settings);
+      qc.invalidateQueries({ queryKey: ["user-settings", user.id] });
+      toast.success("Notification settings saved");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not save notification settings");
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -65,8 +110,8 @@ function NotificationsSettingsPage() {
         <PreferenceSwitch title="League activity" body="New members and league-level updates." checked={settings.leagueActivity} onCheckedChange={(checked) => setSettings((s) => ({ ...s, leagueActivity: checked }))} />
       </section>
 
-      <Button type="button" disabled={!dirty} onClick={save} className="tap mt-6 w-full text-base">
-        Save changes
+      <Button type="button" disabled={!dirty || busy || settingsQuery.isLoading} onClick={save} className="tap mt-6 w-full text-base">
+        {busy ? "Saving…" : "Save changes"}
       </Button>
     </div>
   );

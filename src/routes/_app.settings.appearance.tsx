@@ -70,10 +70,16 @@ function AppearanceSettingsPage() {
     if (!user) return;
     setBusy(true);
     try {
-      const { error } = await supabase.from("user_settings").upsert({
-        user_id: user.id,
-        appearance_theme: theme,
-      });
+      const { data: existing, error: readError } = await supabase
+        .from("user_settings")
+        .select("user_id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (readError) throw readError;
+
+      const { error } = existing
+        ? await supabase.from("user_settings").update({ appearance_theme: theme }).eq("user_id", user.id)
+        : await supabase.from("user_settings").insert({ user_id: user.id, appearance_theme: theme });
       if (error) throw error;
       window.localStorage.removeItem("bisque.appearance");
       setInitial(theme);
